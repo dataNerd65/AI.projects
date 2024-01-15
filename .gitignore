@@ -1,3 +1,5 @@
 # .gitignore
+__pycache__/
+user_session.json
 config.py
 AppData/
