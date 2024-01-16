@@ -46,3 +46,11 @@ spotify.py
 sql
 test_MMustbot.py
 ussd.py
+AppData/
+NTUSER.DAT
+NTUSER.DAT{73f829a2-af0a-11ee-b853-b00cd14be755}.TM.blf
+NTUSER.DAT{73f829a2-af0a-11ee-b853-b00cd14be755}.TMContainer00000000000000000001.regtrans-ms
+NTUSER.DAT{73f829a2-af0a-11ee-b853-b00cd14be755}.TMContainer00000000000000000002.regtrans-ms
+ntuser.dat.LOG1
+ntuser.dat.LOG2
+ntuser.ini
