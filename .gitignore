@@ -1,1 +1,47 @@
-AppData/
+# Ignore unnecessary files and directories
+.DS_Store
+Thumbs.db
+.gitconfig
+.bash_history
+.vscode/
+Codecadet/
+Contacts/
+Desktop/
+Documents/
+Downloads/
+Favorites/
+IdeaProjects/
+IntelGraphicsProfiles/
+Links/
+Local Settings/
+Music/
+My Documents/
+NetHood/
+PrintHood/
+Recent/
+SendTo/
+Start Menu/
+Templates/
+Pictures/
+Saved Games/
+Searches/
+SoftwareDeveloper/
+Videos/
+__pycache__/
+.ntuser.dat
+.ntuser.ini
+.ntuser.dat.LOG1
+.ntuser.dat.LOG2
+Rate+SQL.py
+app.py
+botc.py
+camprate.py
+campratesqlite.py
+copyeditbot.py
+delete
+hello.py
+mysql
+spotify.py
+sql
+test_MMustbot.py
+ussd.py
