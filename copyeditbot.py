@@ -122,7 +122,7 @@ class Chatbot:
         else:
             print("Authentication failed. Please try again.")
 
-  
+
     def process_if_user(self, user_input):
         if not self.current_user:
             self.authenticate_user()
