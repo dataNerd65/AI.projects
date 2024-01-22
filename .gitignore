@@ -1,5 +1,23 @@
-# .gitignore
+# Ignore system-specific directories
+.vscode/
 __pycache__/
-user_session.json
-config.py
-AppData/
+
+# Ignore user-specific files
+.bash_history
+.ntuser.dat*
+.ntuser.ini
+
+# Ignore directories with permission issues
+Application\ Data/
+Cookies/
+Local\ Settings/
+My\ Documents/
+NetHood/
+PrintHood/
+Recent/
+SendTo/
+Start\ Menu/
+Templates/
+
+# Ignore specific files
+.git-for-windows-updater

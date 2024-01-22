@@ -1,5 +1,5 @@
 #Purpose: A chatbot that can answer questions about MMUST
-#Importing the necessary libraries
+# Importing the necessary libraries
 import json
 from config import DATABASE_CONFIG
 import logging
@@ -7,16 +7,14 @@ import mysql.connector
 import nltk
 from nltk.stem import WordNetLemmatizer
 
-nltk.download('wordnet')
-
 # Set up the logging configuration
 logging.basicConfig(level=logging.DEBUG)
 
 class DatabaseManager:
     def __init__(self):
-        self.connection = mysql.connector.connect(**DATABASE_CONFIG)
-        self.cursor = self.connection.cursor()
-        self.create_users_table()
+       self.close_connection = mysql.connector.connect(**DATABASE_CONFIG)
+       self.cursor = self.connection.cursor()
+       self.create_users_table()
 
     def create_users_table(self):
         create_table_query = '''
@@ -58,7 +56,6 @@ class Chatbot:
     def __init__(self):
         self.name = "MMUSTbot"
         self.lemmatizer = WordNetLemmatizer()
-        self.lemmatizer_words = []
         self.database_manager = DatabaseManager()
         self.current_user = self.load_session()
         self.intents = {
@@ -93,14 +90,18 @@ class Chatbot:
     def authenticate_user(self):
         if not self.current_user:
             user_auth_input = input("Enter '1' to log in or '2' to signup: ")
+            print("DEBUG: user_auth_input: ", user_auth_input)
             if user_auth_input == '1':
                 self.login_user()
             elif user_auth_input == '2':
                 self.signup_user()
             else:
                 print("Invalid input. Please enter '1' to log in or '2' to sign up.")
-
+    def get_user_input(self, prompt):
+        #mocking input for testing
+        return input(prompt)
     def signup_user(self):
+        print("DEBUG: Inside signup_user method")
         name = input("Enter your name: ")
         reg_number = input("Enter your registration number: ")
         google_email = input("Enter your google email: ")
@@ -113,6 +114,7 @@ class Chatbot:
         self.process_if_user("signup")
 
     def login_user(self):
+        print("DEBUG: Inside login_user method")
         username = input("Enter your username: ")
         password = input("Enter your password: ")
 
@@ -122,7 +124,6 @@ class Chatbot:
         else:
             print("Authentication failed. Please try again.")
 
-  
     def process_if_user(self, user_input):
         if not self.current_user:
             self.authenticate_user()
@@ -131,36 +132,38 @@ class Chatbot:
 
     def run(self):
         print("Hello! I am MMUSTbot. I am here to help you.")
+
         try:
-            while True:
-                if not self.current_user:
-                    user_auth_input = input("Enter '1' to log in or '2' to signup: ")
-                    if user_auth_input == '1':
-                        self.login_user()
-                    elif user_auth_input == '2':
-                        self.signup_user()
-                    else:
-                        print("Invalid input. Please enter '1' to log in or '2' to sign up.")
-                else:
-                    user_input = input("> ")
-                    if user_input.lower() == "exit":
-                       self.save_session()
-                       print("Bye! Have a nice day.")
-                       break
-                    elif user_input.lower() == "logout":
-                       self.current_user = None
-                       self.save_session()
-                       print("Logged out successfully. Type exit to quit or continue chatting.")
-                    else:
-                       response = self.process_input(user_input)
-                       if response is not None:
-                          print(response)
-                       else:
-                          print("I'm sorry, I don't understand. Can you please rephrase?")
+           while True:
+               if not self.current_user:
+                  user_auth_input = input("Enter '1' to log in or '2' to signup: ")
+                  if user_auth_input == '1':
+                    self.login_user()
+                  elif user_auth_input == '2':
+                    self.signup_user()
+                  else:
+                    print("Invalid input. Please enter '1' to log in or '2' to sign up.")
+                    continue  # Continue to the next iteration of the loop
+
+               user_input = input("> ")
+
+               if user_input.lower() == "exit":
+                   self.save_session()
+                   print("Bye! Have a nice day.")
+                   break
+               elif user_input.lower() == "logout":
+                    self.current_user = None
+                    self.save_session()
+                    print("Logged out successfully. Type exit to quit or continue chatting.")
+               else:
+                   self.process_input(user_input)  # Call process_input to handle user input
         finally:
-            self.database_manager.close_connection()
+           # Closing database connection
+           self.database_manager.close_connection()
+
 
     def process_input(self, user_input):
+        print("DEBUG: Inside process_input method")
         self.authenticate_user()
         words = set(nltk.word_tokenize(user_input.lower()))
         self.lemmatizer_words = [self.lemmatizer.lemmatize(word) for word in words]
@@ -172,11 +175,13 @@ class Chatbot:
                 lemmatized_words = set(nltk.word_tokenize(user_input.lower()))
                 lemmatized_words = [self.lemmatizer.lemmatize(word) for word in lemmatized_words]
                 if service in lemmatized_words and query in lemmatized_words:
+                    print("DEBUG: Recognized service type. calling recognize_question type.", service)
                     return self.recognize_question_type([service], [query])
 
         for intent, keywords in self.intents.items():
             for word in self.lemmatizer_words:
                 if word in keywords:
+                    print("DEBUG: Recognized intent '{intent}'. Calling respond method.")
                     return self.respond(intent)
 
         return "I'm sorry, I don't understand. Can you please rephrase?"
