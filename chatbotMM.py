@@ -27,6 +27,7 @@ class Chatbot:
                       "cancel", "book", "reserve", "pay", "buy", "purchase", "order", "apply", "enroll", "register",
                       "join", "leave", "exit", "graduate"]
         }
+        self.greeting_provided = False
 
     def run(self):
         print("Hello! I am MMUSTbot. I am here to help you.")
@@ -69,73 +70,68 @@ class Chatbot:
 
         print("Recognized intent: ", recognized_intent)  # Debugging
         if recognized_intent:
-           if recognized_intent == "questions":
-              self.recognize_question_type(
-                set(self.intents["services"]), set(self.intents["query"])
-              )
-              response_provided = True
-           else:
-              self.respond(recognized_intent)
+            if recognized_intent == "questions":
+                self.recognize_question_type(
+                    set(self.intents["services"]), set(self.intents["query"])
+                )
+                response_provided = True
 
         return recognized_intent, response_provided
 
     def recognize_question_type(self, services_intersection, query_intersection):
         # Implementing logic to recognize the type of question based on services and queries
+        recognized_services = set(services_intersection) & set(self.lemmatizer_words)
+        recognized_queries = set(query_intersection) & set(self.lemmatizer_words)
         relevant_responses = []
-        if set(["fees", "fee"]).intersection(set(services_intersection)):
-            if "pay" in query_intersection:
-                relevant_responses.append("You can pay your fees via the jiunge app on Google PlayStore. Sign up with your details and do confirm them. Then proceed to pay your fees. The link is https://play.google.com/store/apps/details?id=com.jiunge.app&hl=en&gl=US.")
-            elif "check" in query_intersection:
-                relevant_responses.append("You can check your fees balance by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
-            elif "confirm" in query_intersection:
-                relevant_responses.append("You can confirm your fees payment by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
-            elif "view" in query_intersection:
-                relevant_responses.append("You can view your fees structure and balance by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
-            elif "download" in query_intersection:
-                relevant_responses.append("You can download your fees structure by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
-            elif "print" in query_intersection:
-                relevant_responses.append("You can print your fees structure by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
 
-        if set(["admission"]).intersection(set(services_intersection)):
-            if "apply" in query_intersection:
-                relevant_responses.append("You can apply for admission by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
-            elif "enroll" in query_intersection:
-                relevant_responses.append("You can enroll for admission by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
-            elif "register" in query_intersection:
-                relevant_responses.append("You can register for admission by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
-            elif "join" in query_intersection:
-                relevant_responses.append("You can join for admission by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
+        if {"fees", "fee"} & recognized_services:
+           if "pay" in recognized_queries:
+               relevant_responses.append("You can pay your fees via the jiunge app on Google PlayStore. Sign up with your details and do confirm them. Then proceed to pay your fees. The link is https://play.google.com/store/apps/details?id=com.jiunge.app&hl=en&gl=US.")
+           elif "check" in recognized_queries:
+               relevant_responses.append("You can check your fees balance by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
+           elif "confirm" in recognized_queries:
+               relevant_responses.append("You can confirm your fees payment by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
+           elif "view" in recognized_queries:
+               relevant_responses.append("You can view your fees structure and balance by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
+           elif "download" in recognized_queries:
+               relevant_responses.append("You can download your fees structure by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
+           elif "print" in recognized_queries:
+               relevant_responses.append("You can print your fees structure by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
 
-        if any(keyword in self.lemmatizer_words for keyword in ["units", "unit", "class", "classes", "courses", "course"]) and any(query in self.lemmatizer_words for query in ["access", "get", "find", "check", "know", "check", "confirm", "search", "view", "see", "tell"]):
-                relevant_responses.append("You can know more about your classes and units by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
+        if {"admission"} & recognized_services:
+           if any(keyword in recognized_queries for keyword in ["apply", "enroll", "register", "join"]):
+              relevant_responses.append("You can apply for admission by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
 
-        if set(["hostel"]).intersection(set(services_intersection)):
-            if "check" in query_intersection:
-                relevant_responses.append("You can check your hostel by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
-            elif "confirm" in query_intersection:
-                relevant_responses.append("You can confirm your hostel by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
-            elif "view" in query_intersection:
-                relevant_responses.append("You can view your hostel by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
-            elif "check" in query_intersection:
-                relevant_responses.append("You can check in your hostel by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
+        if {"units", "unit", "class", "classes", "courses", "course"} & set(self.lemmatizer_words) and any(query in recognized_queries for query in ["access", "get", "find", "check", "know", "confirm", "search", "view", "see", "tell"]):
+            relevant_responses.append("You can know more about your classes and units by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
 
-        if "portal" in self.lemmatizer_words and any(query in self.lemmatizer_words for query in ["access", "get", "find", "know", "check", "confirm", "locate", "search", "view", "see", "tell", "give", "provide", "display", "receive", "register", "login", "log in", "log out", "sign in", "sign out", "sign up", "sign", "create", "add", "update", "edit", "change", "apply", "enroll", "register", "join"]):
-                relevant_responses.append("You can access the student portal by logging into the student portal and the link is https://portal.mmust.ac.ke/")
+        if {"hostel"} & recognized_services:
+           if any(keyword in recognized_queries for keyword in ["check", "confirm", "view"]):
+              relevant_responses.append("You can check your hostel details by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
 
-        if set(["email", "e-mail"]).intersection(set(self.lemmatizer_words)) and any(query in self.lemmatizer_words for query in ["access", "get", "find", "check", "know", "check", "confirm", "locate", "search", "view", "see", "tell", "give", "provide", "display", "receive", "register", "login", "log in", "log out", "sign in", "sign out", "sign up", "sign", "create", "add", "update", "edit", "change", "apply", "enroll", "register", "join"]):
-                relevant_responses.append("You can access your email by first creating it as shown in admission details and then logging into it. If facing any challenges, please visit the ICT department.")
+        if {"portal"} & set(self.lemmatizer_words):
+           if any(query in recognized_queries for query in ["access", "get", "find", "know", "check", "confirm", "locate", "search", "view", "see", "tell", "give", "provide", "display", "receive", "register", "login", "log in", "log out", "sign in", "sign out", "sign up", "sign", "create", "add", "update", "edit", "change", "apply", "enroll", "register", "join"]):
+              relevant_responses.append("You can access the student portal by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
 
-        if set(["e-learning", "odel"]).intersection(set(self.lemmatizer_words)) and any(query in self.lemmatizer_words for query in ["access", "get", "find", "check", "know", "check", "confirm", "locate", "search", "view", "see", "tell", "give", "provide", "display", "receive", "register", "login", "log in", "log out", "sign in", "sign out", "sign up", "sign", "create", "add", "update", "edit", "change", "apply", "enroll", "register", "join"]):
-                relevant_responses.append("You can access the e-learning portal by logging into the e-learning portal, and the link is https://elearning.mmust.ac.ke/.")
-        # Printing the relevant response
-        for response in relevant_responses:
-            print(response)
-        if not relevant_responses:
-            print("I'm sorry, I don't understand. Can you please rephrase?")
+        if {"email", "e-mail"} & set(self.lemmatizer_words):
+           if any(query in recognized_queries for query in ["access", "get", "find", "check", "know", "check", "confirm", "locate", "search", "view", "see", "tell", "give", "provide", "display", "receive", "register", "login", "log in", "log out", "sign in", "sign out", "sign up", "sign", "create", "add", "update", "edit", "change", "apply", "enroll", "register", "join"]):
+              relevant_responses.append("You can access your email by first creating it as shown in admission details and then logging into it. If facing any challenges, please visit the ICT department.")
+
+        if {"e-learning", "odel"} & set(self.lemmatizer_words):
+           if any(query in recognized_queries for query in ["access", "get", "find", "check", "know", "check", "confirm", "locate", "search", "view", "see", "tell", "give", "provide", "display", "receive", "register", "login", "log in", "log out", "sign in", "sign out", "sign up", "sign", "create", "add", "update", "edit", "change", "apply", "enroll", "register", "join"]):
+            relevant_responses.append("You can access the e-learning portal by logging into the e-learning portal, and the link is https://elearning.mmust.ac.ke/.")
+
+       # Printing the relevant response
+        if relevant_responses:
+           print(relevant_responses[0])
+        else:
+           print("I'm sorry, I don't understand. Can you please rephrase?")
+
 
     def respond(self, intent):
-        if intent == "greeting":
+        if intent == "greeting" and not self.greeting_provided:
             print("Hello! How can I help you today?")
+            self.greeting_provided = True  # Set the flag to True to avoid repeating the greeting
         elif intent == "goodbye":
             print("Bye! Have a nice day.")
         elif intent == "questions":
