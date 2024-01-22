@@ -21,3 +21,4 @@ Templates/
 
 # Ignore specific files
 .git-for-windows-updater
+config.py
