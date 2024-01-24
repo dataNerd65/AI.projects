@@ -106,7 +106,7 @@ class Chatbot:
             relevant_responses.append("You can know more about your classes and units by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
 
         if {"hostel"} & recognized_services:
-           if any(keyword in recognized_queries for keyword in ["check", "confirm", "view"]):
+           if any(keyword in recognized_queries for keyword in ["check", "access", "confirm", "view", "see", "tell", "give", "provide", "display", "receive", "register", "login", "log in", "log out", "sign in", "sign out", "sign up", "sign", "create", "add", "update", "edit", "change", "apply", "enroll", "register", "join"]):
               relevant_responses.append("You can check your hostel details by logging into the student portal and the link is https://portal.mmust.ac.ke/.")
 
         if {"portal"} & set(self.lemmatizer_words):
