@@ -1,0 +1,22 @@
+How can i pay my fees?, fees
+How much is the fee?, fees
+How much is the fee for computer science?, fees
+What are the admission requirements?, admission
+How can i apply for admission?, admission
+How can i enroll for admission?, admission
+How can i register for admission?, admission
+How can i join the university?, admission
+How can i get my admission letter?, admission
+How can i get my admission number?, admission
+What are the course offerings for this semester?, course
+What is the schedule for the computer science course?, course
+How can I drop a course?, course
+How can I change my major?, course
+What are the graduation requirements?, graduation
+How can I apply for graduation?, graduation
+How can I get my diploma?, graduation
+What are the library hours?, library
+How can I borrow a book?, library
+How can I renew my library books?, library
+How can I reserve a study room?, library
+How can I access online resources?, library
