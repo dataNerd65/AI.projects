@@ -20,3 +20,23 @@ How can I borrow a book?, library
 How can I renew my library books?, library
 How can I reserve a study room?, library
 How can I access online resources?, library
+What is the deadline for course registration?, course
+What are the prerequisites for the engineering course?, course
+Can I take a course as pass/fail?, course
+What is the process for course withdrawal?, course
+What are the requirements for honors graduation?, graduation
+When is the graduation ceremony?, graduation
+What is the dress code for the graduation ceremony?, graduation
+How can I order my graduation cap and gown?, graduation
+What are the library's policies on late returns?, library
+How can I request a book that's not in the library?, library
+Can I access library resources from off-campus?, library
+What are the library's policies on noise and food?, library
+What is the fee for late payment?, fees
+Can I pay fees in installments?, fees
+What is the refund policy on fees?, fees
+What are the hostel charges?, fees
+What are the admission criteria for postgraduate courses?, admission
+What is the procedure for international students' admission?, admission
+Can I apply for early admission?, admission
+What is the admission process for transfer students?, admission

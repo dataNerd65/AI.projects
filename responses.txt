@@ -1,0 +1,5 @@
+greeting, Hello! How can I help you today?
+goodbye, Bye! Have a nice day.
+fees_pay, You can pay your fees via the jiunge app on Google PlayStore. Sign up with your details and do confirm them. Then proceed to pay your fees. The link is https://play.google.com/store/apps/details?id=com.jiunge.app&hl=en&gl=US.
+fees_check, You can check your fees balance by logging into the student portal and the link is https://portal.mmust.ac.ke/.
+admission_apply, You can apply for admission by logging into the student portal and the link is https://portal.mmust.ac.ke/.

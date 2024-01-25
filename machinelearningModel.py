@@ -4,6 +4,34 @@ from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
 
+#Reading the data from a file for code readability
+def read_data_from_file(file_path):
+    with open(file_path, 'r') as file:
+        data = [line.strip().split(', ') for line in file]
+    return data
+#Usage
+file_path = r'C:\Users\ADMIN\SoftwareDeveloper\questions+categories.txt'
+data  = read_data_from_file(file_path)
+
+#The data will contain the questions and the category they belong to
+for question, category in data:
+    print(f"Question: {question} , Category: {category}")
+
+#now reading the responses from a file
+def read_responses_from_file(file_path):
+    with open(file_path, 'r') as file:
+        responses = dict(line.strip().split(', ') for line in file)
+    return responses
+    
+#The usage
+file_path_responses = r'C:\Users\ADMIN\SoftwareDeveloper\responses.txt'
+responses = read_responses_from_file(file_path_responses)
+
+#the response response pairs
+for intent,response in responses.items():
+    print(f"Intent: {intent}, Response: {response}")
+    
+
 #The data with the questions and queries
 data = [("How can i pay my fees?", "fees"),
         ("How much is the fee?", "fees"),
