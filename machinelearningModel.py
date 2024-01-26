@@ -1,3 +1,7 @@
+#Importing the libraries and their dependencies
+import numpy as np
+import spacy
+import scipy.sparse
 from sklearn.svm import SVC
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.pipeline import make_pipeline
@@ -8,6 +12,9 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, classification_report
+
+#Loading the spacy model
+nlp = spacy.load('en_core_web_sm')
 
 def read_data_from_file(file_path):
     with open(file_path, 'r') as file:
@@ -23,29 +30,135 @@ def split_data(data):
     X, y = zip(*data)
     return X, y
 
-def train_and_evaluate_model(model, X_train, y_train, X_test, y_test):
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
+def process_text_with_spacy(text_or_array):
+    if isinstance(text_or_array, np.ndarray):
+        # Convert the NumPy array to a string
+        text = ' '.join(map(str, text_or_array))
+    else:
+        # Use the input text directly
+        text = text_or_array
+    
+    # Process the text with spaCy
+    doc = nlp(text)
+    
+    # Extract lemmatized tokens
+    lemmatized_tokens = [token.lemma_ for token in doc if not token.is_stop and token.is_alpha]
 
-    #Printing the confusion matrix
-    print(f"{type(model).__name__} Confusion Matrix:")
+    return lemmatized_tokens
+
+def train_and_evaluate_model(model, X_train, y_train, X_test, y_test):
+    if isinstance(model, GridSearchCV):
+        # Fit GridSearchCV to find the best hyperparameters
+        model.fit(X_train, y_train)
+
+        # Extract the best estimator from GridSearchCV
+        best_estimator = model.best_estimator_
+    elif hasattr(model, 'named_steps'):
+        # If model is a simple pipeline, use it directly
+        best_estimator = model
+    else:
+        print("Invalid model. Please provide a valid model.")
+        return model
+
+    # Process text with spaCy for training and testing sets
+    X_train_spacy = [' '.join(process_text_with_spacy(text)) for text in X_train]
+    X_test_spacy = [' '.join(process_text_with_spacy(text)) for text in X_test]
+
+    # Use CountVectorizer for feature extraction
+    if not X_train_spacy or not X_test_spacy:
+        print("No valid text data to process.")
+        return model
+
+    best_estimator.named_steps['countvectorizer'].fit(X_train_spacy)
+
+    # Transform text data to feature vectors
+    X_train_transformed = best_estimator.named_steps['countvectorizer'].transform(X_train_spacy)
+    X_test_transformed = best_estimator.named_steps['countvectorizer'].transform(X_test_spacy)
+
+    # Print available steps
+    print(f"Available steps: {best_estimator.named_steps.keys()}")
+
+    # Get the last step dynamically
+    last_step_name = list(best_estimator.named_steps.keys())[-1]
+    final_estimator = best_estimator.named_steps[last_step_name]
+
+    if isinstance(final_estimator, RandomForestClassifier):
+        # Fit the RandomForestClassifier
+        final_estimator.fit(X_train_transformed, y_train)
+        # Predict and evaluate the model
+        y_pred = final_estimator.predict(X_test_transformed)
+    else:
+        print("Invalid model step. Please provide a valid step for fitting.")
+        return model
+
+    # Printing the confusion matrix
+    print(f"{type(best_estimator).__name__} Confusion Matrix:")
     print(confusion_matrix(y_test, y_pred))
 
-    #Printing the classification report
-    print(f"{type(model).__name__} Classification Report:")
+    # Printing the classification report
+    print(f"{type(best_estimator).__name__} Classification Report:")
     print(classification_report(y_test, y_pred))
-    
-    #Printing the accuracy score
+
+    # Printing the accuracy score
     accuracy = metrics.accuracy_score(y_test, y_pred)
-    print(f"{type(model).__name__} Accuracy: {accuracy}")
-    
+    print(f"{type(best_estimator).__name__} Accuracy: {accuracy}")
+
     return model
 
 def predict_intent(model, responses, user_input):
-    predicted_intent = model.predict([user_input])[0]
+    # Process user input with spaCy
+    processed_input = ' '.join(process_text_with_spacy(user_input))
+
+    # Check if the model is a pipeline with named steps
+    if hasattr(model, 'named_steps'):
+        # Transform the input to feature vectors
+        input_transformed = model.named_steps['countvectorizer'].transform([processed_input])
+
+        # Get the final estimator dynamically
+        last_step_name = list(model.named_steps.keys())[-1]
+        final_estimator = model.named_steps[last_step_name]
+    else:
+        # If not a pipeline, assume the model itself is the final estimator
+        input_transformed = model.best_estimator_['countvectorizer'].transform([processed_input])
+        final_estimator = model.best_estimator_
+
+    # Debug print
+    print("Processed Input:", processed_input)
+    print("Input Transformed:", input_transformed)
+
+    # Check if the input_transformed is a sparse matrix or a numpy array
+    if scipy.sparse.issparse(input_transformed):
+        # If sparse matrix, convert it to an array
+        input_transformed = input_transformed.toarray()
+    elif isinstance(input_transformed, np.ndarray):
+        # If it's already a numpy array, convert it to a string
+        input_transformed = ' '.join(map(str, input_transformed))
+    else:
+        # Handle other data types if needed
+        raise ValueError(f"Unexpected input type: {type(input_transformed)}")
+
+    # Check if the input_transformed is a 2D array (matrix)
+    if input_transformed.ndim == 2:
+        # If 2D array, take the first row (assuming one input)
+        input_transformed = input_transformed[0]
+
+    # Debug print
+    print("Input Transformed (After Check):", input_transformed)
+
+    # Predict intent
+    if hasattr(final_estimator, 'predict_proba'):
+        # If the final estimator supports predict_proba, use it
+        predicted_intent = final_estimator.predict(input_transformed.reshape(1, -1))[0]
+    else:
+        # Otherwise, use predict
+        predicted_intent = final_estimator.predict(input_transformed.reshape(1, -1))[0]
+
+    # Get the response
     response = responses.get(predicted_intent, "Sorry, I don't understand. Please try again.")
+
     print(f"{type(model).__name__} Predicted Intent: {predicted_intent}")
     print(f"Response: {response}")
+
 
 # Loading data
 file_path = r'C:\Users\ADMIN\SoftwareDeveloper\questions+categories.txt'
