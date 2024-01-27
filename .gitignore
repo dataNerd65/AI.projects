@@ -1,3 +1,24 @@
+<<<<<<< HEAD
+# Ignore unnecessary files and directories
+.DS_Store
+Thumbs.db
+.gitconfig
+.bash_history
+.vscode/
+Codecadet/
+.git-for-windows-updater
+Contacts/
+Desktop/
+Documents/
+Downloads/
+Favorites/
+IdeaProjects/
+IntelGraphicsProfiles/
+Links/
+Local Settings/
+Music/
+My Documents/
+=======
 # Ignore system-specific directories
 .vscode/
 __pycache__/
@@ -12,13 +33,50 @@ Application\ Data/
 Cookies/
 Local\ Settings/
 My\ Documents/
+>>>>>>> 83cd538a8904a1366dabb4bab9e6b3af4e301cb1
 NetHood/
 PrintHood/
 Recent/
 SendTo/
+<<<<<<< HEAD
+Start Menu/
+Templates/
+Pictures/
+Saved Games/
+Searches/
+SoftwareDeveloper/
+Videos/
+__pycache__/
+.ntuser.dat
+.ntuser.ini
+.ntuser.dat.LOG1
+.ntuser.dat.LOG2
+Rate+SQL.py
+app.py
+botc.py
+camprate.py
+campratesqlite.py
+copyeditbot.py
+delete
+hello.py
+mysql
+spotify.py
+sql
+test_MMustbot.py
+ussd.py
+AppData/
+NTUSER.DAT
+NTUSER.DAT{73f829a2-af0a-11ee-b853-b00cd14be755}.TM.blf
+NTUSER.DAT{73f829a2-af0a-11ee-b853-b00cd14be755}.TMContainer00000000000000000001.regtrans-ms
+NTUSER.DAT{73f829a2-af0a-11ee-b853-b00cd14be755}.TMContainer00000000000000000002.regtrans-ms
+ntuser.dat.LOG1
+ntuser.dat.LOG2
+ntuser.ini
+=======
 Start\ Menu/
 Templates/
 
 # Ignore specific files
 .git-for-windows-updater
 config.py
+>>>>>>> 83cd538a8904a1366dabb4bab9e6b3af4e301cb1
