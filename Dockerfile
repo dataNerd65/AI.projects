@@ -1,17 +1,27 @@
-#Use an official python runtime as the base image
-FROM python:3.9-slim
+# Use an appropriate base image
+FROM python:3.9
 
-#Set the working directory in the container
-WORKDIR /ap
+# Set the working directory in the container
+WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . /ap
+# Copy the Python script into the container
+COPY machinelearningModel.py .
 
-install dependecies
-RUN pip install --no-cache-dir numpy spacy scikit-learn
+# Copy the data files into the container
+COPY questions+categories.txt .
+COPY responses.txt .
 
-#Download the English model for spaCy
-RUN python -m spacy download en_core_web_sm
+# Install spaCy and download the English model
+RUN pip install spacy && \
+    python -m spacy download en_core_web_sm
 
-#Command to run the Python script
+# Copy the requirements file and install dependencies
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# Define the command to run your Python script
 CMD ["python", "machinelearningModel.py"]
+
+
+
+
