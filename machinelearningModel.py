@@ -46,6 +46,7 @@ def process_text_with_spacy(text_or_array):
 
     return lemmatized_tokens
 
+
 def train_and_evaluate_model(model, X_train, y_train, X_test, y_test):
     if isinstance(model, GridSearchCV):
         # Fit GridSearchCV to find the best hyperparameters
@@ -69,11 +70,13 @@ def train_and_evaluate_model(model, X_train, y_train, X_test, y_test):
         print("No valid text data to process.")
         return model
 
-    best_estimator.named_steps['countvectorizer'].fit(X_train_spacy)
+    # Use the same CountVectorizer instance for both training and prediction
+    count_vectorizer = CountVectorizer()
+    X_train_transformed = count_vectorizer.fit_transform(X_train_spacy)
+    X_test_transformed = count_vectorizer.transform(X_test_spacy)
 
-    # Transform text data to feature vectors
-    X_train_transformed = best_estimator.named_steps['countvectorizer'].transform(X_train_spacy)
-    X_test_transformed = best_estimator.named_steps['countvectorizer'].transform(X_test_spacy)
+    # Update the model with the trained CountVectorizer
+    best_estimator.named_steps['countvectorizer'] = count_vectorizer
 
     # Print available steps
     print(f"Available steps: {best_estimator.named_steps.keys()}")
@@ -107,54 +110,22 @@ def train_and_evaluate_model(model, X_train, y_train, X_test, y_test):
 
 def predict_intent(model, responses, user_input):
     # Process user input with spaCy
-    processed_input = ' '.join(process_text_with_spacy(user_input))
+    processed_input = [' '.join(process_text_with_spacy(text)) for text in user_input]
 
-    # Check if the model is a pipeline with named steps
-    if hasattr(model, 'named_steps'):
-        # Transform the input to feature vectors
-        input_transformed = model.named_steps['countvectorizer'].transform([processed_input])
+    # Extract the CountVectorizer from the best estimator
+    count_vectorizer = model.best_estimator_['countvectorizer']
 
-        # Get the final estimator dynamically
-        last_step_name = list(model.named_steps.keys())[-1]
-        final_estimator = model.named_steps[last_step_name]
-    else:
-        # If not a pipeline, assume the model itself is the final estimator
-        input_transformed = model.best_estimator_['countvectorizer'].transform([processed_input])
-        final_estimator = model.best_estimator_
+    # Transform the input using the CountVectorizer
+    input_transformed = count_vectorizer.transform(processed_input)
 
-    # Debug print
-    print("Processed Input:", processed_input)
-    print("Input Transformed:", input_transformed)
-
-    # Check if the input_transformed is a sparse matrix or a numpy array
-    if scipy.sparse.issparse(input_transformed):
-        # If sparse matrix, convert it to an array
-        input_transformed = input_transformed.toarray()
-    elif isinstance(input_transformed, np.ndarray):
-        # If it's already a numpy array, convert it to a string
-        input_transformed = ' '.join(map(str, input_transformed))
-    else:
-        # Handle other data types if needed
-        raise ValueError(f"Unexpected input type: {type(input_transformed)}")
-
-    # Check if the input_transformed is a 2D array (matrix)
-    if input_transformed.ndim == 2:
-        # If 2D array, take the first row (assuming one input)
-        input_transformed = input_transformed[0]
-
-    # Debug print
-    print("Input Transformed (After Check):", input_transformed)
+    # Convert the sparse matrix to a dense array
+    input_transformed_array = input_transformed.toarray()
 
     # Predict intent
-    if hasattr(final_estimator, 'predict_proba'):
-        # If the final estimator supports predict_proba, use it
-        predicted_intent = final_estimator.predict(input_transformed.reshape(1, -1))[0]
-    else:
-        # Otherwise, use predict
-        predicted_intent = final_estimator.predict(input_transformed.reshape(1, -1))[0]
+    predicted_intent = model.predict(input_transformed_array)
 
     # Get the response
-    response = responses.get(predicted_intent, "Sorry, I don't understand. Please try again.")
+    response = [responses.get(intent, "Sorry, I don't understand. Please try again.") for intent in predicted_intent]
 
     print(f"{type(model).__name__} Predicted Intent: {predicted_intent}")
     print(f"Response: {response}")
