@@ -37,10 +37,10 @@ def process_text_with_spacy(text_or_array):
     else:
         # Use the input text directly
         text = text_or_array
-    
+
     # Process the text with spaCy
     doc = nlp(text)
-    
+
     # Extract lemmatized tokens
     lemmatized_tokens = [token.lemma_ for token in doc if not token.is_stop and token.is_alpha]
 
@@ -172,11 +172,11 @@ best_lr_model = train_and_evaluate_model(lr_model, X_train, y_train, X_test, y_t
 # Continuous user input loop
 while True:
     user_input = input("Enter your question (type 'exit' to quit): ")
-    
+
     if user_input.lower() == 'exit':
         print("Have an octostatic day. Goodbye!")
         break
-    
+
     # Predict intent using each model
     predict_intent(best_svm_model, responses, user_input)
     predict_intent(best_rf_model, responses, user_input)
