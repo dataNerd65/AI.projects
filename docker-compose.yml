@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  projoofirst:
+    build: .
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    stdin_open: true
