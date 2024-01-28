@@ -2,9 +2,13 @@ version: '3.8'
 
 services:
   projoofirst:
-    build: .
+    build: 
+      context: .
     environment:
       - PYTHONUNBUFFERED=1
     stdin_open: true
+
+
+
 
 
