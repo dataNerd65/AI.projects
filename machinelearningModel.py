@@ -1,7 +1,6 @@
 #Importing the libraries and their dependencies
 import numpy as np
 import spacy
-import scipy.sparse
 from sklearn.svm import SVC
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.pipeline import make_pipeline
@@ -13,7 +12,11 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, classification_report
 
-#Loading the spacy model
+
+# Import missing libraries and dependencies
+import scipy.sparse
+
+# Loading the spacy model
 nlp = spacy.load('en_core_web_sm')
 
 def read_data_from_file(file_path):
@@ -110,34 +113,30 @@ def train_and_evaluate_model(model, X_train, y_train, X_test, y_test):
 
 def predict_intent(model, responses, user_input):
     # Process user input with spaCy
-    processed_input = [' '.join(process_text_with_spacy(text)) for text in user_input]
+    processed_input = ' '.join(process_text_with_spacy(user_input))
 
     # Extract the CountVectorizer from the best estimator
     count_vectorizer = model.best_estimator_['countvectorizer']
 
     # Transform the input using the CountVectorizer
-    input_transformed = count_vectorizer.transform(processed_input)
-
-    # Convert the sparse matrix to a dense array
-    input_transformed_array = input_transformed.toarray()
+    input_transformed = count_vectorizer.transform([processed_input])
 
     # Predict intent
-    predicted_intent = model.predict(input_transformed_array)
+    predicted_intent = model.predict(input_transformed)
 
     # Get the response
-    response = [responses.get(intent, "Sorry, I don't understand. Please try again.") for intent in predicted_intent]
+    response = responses.get(predicted_intent[0], "Sorry, I don't understand. Please try again.")
 
-    print(f"{type(model).__name__} Predicted Intent: {predicted_intent}")
-    print(f"Response: {response}")
-
+    return response
 
 # Loading data
-file_path = r'C:\Users\ADMIN\SoftwareDeveloper\questions+categories.txt'
+file_path = r'C:\Users\ADMIN\SoftwareDeveloper\questions+categories.txt'  # Update the file path to match the Docker container path
 data = read_data_from_file(file_path)
 
 # Loading responses
-file_path_responses = r'C:\Users\ADMIN\SoftwareDeveloper\responses.txt'
+file_path_responses = r'C:\Users\ADMIN\SoftwareDeveloper\responses.txt'  # Update the file path to match the Docker container path
 responses = read_responses_from_file(file_path_responses)
+
 
 # Splitting data
 X, y = split_data(data)

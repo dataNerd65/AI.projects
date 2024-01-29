@@ -1,26 +1,22 @@
-# Use an appropriate base image
-FROM python:3.9
+# Use an official Python runtime as a parent image
+FROM python:3.8
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the Python script into the container
-COPY machinelearningModel.py .
+# Copy the current directory contents into the container at /app
+COPY . /app
 
-# Copy the data files into the container
-COPY questions+categories.txt .
-COPY responses.txt .
+# Install any needed dependencies specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install spaCy and download the English model
-RUN pip install spacy && \
-    python -m spacy download en_core_web_sm
+# Install NLTK data (you can also download NLTK data during runtime if you prefer)
+RUN python -m nltk.downloader all
 
-# Copy the requirements file and install dependencies
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+# Run the chatbot script
+CMD [ "python", "chatbotMM.py" ]
 
-# Define the command to run your Python script
-CMD ["python", "machinelearningModel.py"]
+
 
 
 

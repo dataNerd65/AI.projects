@@ -32,29 +32,31 @@ class Chatbot:
     def run(self):
         print("Hello! I am MMUSTbot. I am here to help you.")
         try:
-            while True:
+           while True:
                 user_input = input("> ")
 
                 if user_input.lower() == "exit":
-                    self.save_session()
-                    print("Bye! Have a nice day.")
-                    break
+                   self.save_session()
+                   print("Bye! Have a nice day.")
+                   break
                 elif user_input.lower() == "logout":
-                    self.current_user = None
-                    self.save_session()
-                    print("Logged out successfully. Type exit to quit or continue chatting.")
+                     self.current_user = None
+                     self.save_session()
+                     print("Logged out successfully. Type exit to quit or continue chatting.")
                 else:
                     recognized_intent, response_provided = self.process_input(user_input)
 
                     if response_provided:
-                        continue  # Skip the remaining steps and continue to the next iteration
+                       continue  # Skip the remaining steps and continue to the next iteration
 
-                    if recognized_intent:
-                        self.respond(recognized_intent)
-                    else:
-                        print("I'm sorry, I don't understand. Can you please rephrase?")
+                if recognized_intent:
+                    self.respond(recognized_intent)
+                else:
+                    print("I'm sorry, I don't understand. Can you please rephrase?")
+        except EOFError:
+              print("Unexpected end of input. Exiting...")
         finally:
-            print("Chatbot session ended.")
+             print("Chatbot session ended.")
 
     def process_input(self, user_input):
         words = set(nltk.word_tokenize(user_input.lower()))
