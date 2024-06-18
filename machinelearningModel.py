@@ -130,11 +130,11 @@ def predict_intent(model, responses, user_input):
     return response
 
 # Loading data
-file_path = r'C:\Users\ADMIN\SoftwareDeveloper\questions+categories.txt'  # Update the file path to match the Docker container path
+file_path = r'/home/peter-kiarie/AIprojects/AI.projects/questions+categories.txt'  # Update the file path to match the Docker container path
 data = read_data_from_file(file_path)
 
 # Loading responses
-file_path_responses = r'C:\Users\ADMIN\SoftwareDeveloper\responses.txt'  # Update the file path to match the Docker container path
+file_path_responses = r'/home/peter-kiarie/AIprojects/AI.projects/responses.txt'  # Update the file path to match the Docker container path
 responses = read_responses_from_file(file_path_responses)
 
 
